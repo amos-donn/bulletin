@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+.env*
+
+# local run artifacts
+dev.log
+dev.pid

@@ -1,0 +1,221 @@
+/* Same voice as the Hilltoppers popup: quiet white cards on #f7f8fb, one green
+   accent, uppercase micro-labels, nothing that moves unless it has to. */
+:root {
+  color-scheme: only light;
+  --ink: #111111;
+  --ink-soft: #161b22;
+  --muted: #7d8591;
+  --faint: #a0a7b0;
+  --rule: rgba(17, 17, 17, 0.12);
+  --card-rule: rgba(17, 17, 17, 0.18);
+  --page: #f7f8fb;
+  --green: #1a7f37;
+  --green-tint: rgba(26, 127, 55, 0.12);
+  --green-line: rgba(26, 127, 55, 0.25);
+  --danger: #d1242f;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  color: var(--ink);
+  background: var(--page);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; }
+body { min-height: 100dvh; -webkit-text-size-adjust: 100%; }
+main { max-width: 620px; margin: 48px auto; padding: 0 20px; }
+img, video, input, textarea, select { max-width: 100%; }
+
+.eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 1.6px; color: #748079; }
+h1 { font-size: 32px; margin: 10px 0 24px; letter-spacing: -1px; color: var(--ink); }
+
+/* The card is one object: header, scrolling text, footer. */
+.bulletin {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid var(--card-rule);
+  border-radius: 8px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.bulletin:hover { border-color: rgba(17, 17, 17, 0.28); box-shadow: 0 6px 14px rgba(17, 17, 17, 0.08); }
+
+.bulletin-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid var(--rule);
+}
+.bulletin-heading { min-width: 0; flex: 1 1 auto; }
+.bulletin-weekday {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.bulletin-date {
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.day-pill {
+  flex: 0 0 auto;
+  align-self: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.day-pill.green { background: var(--green-tint); border-color: var(--green-line); color: #14532d; }
+.day-pill.white { background: #f0f2f5; border-color: rgba(17, 17, 17, 0.18); color: #555f6a; }
+.day-pill.neutral { background: #f0f2f5; border-color: rgba(17, 17, 17, 0.18); color: #555f6a; }
+
+.icon-button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+.icon-button svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-button:hover { color: var(--green); background: rgba(17, 17, 17, 0.06); }
+.icon-button:active { transform: scale(0.92); }
+.icon-button.spinning svg { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.bulletin-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 10px 12px 4px;
+  max-height: min(64dvh, 620px);
+}
+
+.block {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+.block:last-child { margin-bottom: 6px; }
+.block-head {
+  margin: 14px 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #4a5560;
+}
+.block-head:first-child { margin-top: 0; }
+.block-list { margin: 0 0 10px; padding-left: 16px; }
+.block-list .block { margin-bottom: 4px; }
+
+.bulletin-note {
+  margin: 0;
+  padding: 6px 12px;
+  border-top: 1px solid var(--rule);
+  font-size: 11px;
+  line-height: 1.5;
+  color: #8a6d3b;
+}
+.bulletin-note[data-tone="quiet"] { color: var(--muted); }
+
+.bulletin-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px 8px;
+  border-top: 1px solid var(--rule);
+}
+.bulletin-stamp {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 11px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bulletin-link {
+  flex: 0 0 auto;
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.bulletin-link:hover { text-decoration: underline; }
+
+/* Loading and failure both hold the card's shape, so opening the topping does
+   not jump from one height to another. */
+.skeleton-lines { display: flex; flex-direction: column; gap: 9px; padding: 4px 0 12px; }
+.skeleton {
+  display: block;
+  height: 9px;
+  border-radius: 999px;
+  background: #eceef1;
+  animation: breathe 1.4s ease-in-out infinite;
+}
+.skeleton:nth-child(2) { width: 92%; animation-delay: 0.12s; }
+.skeleton:nth-child(3) { width: 96%; animation-delay: 0.24s; }
+.skeleton:nth-child(4) { width: 64%; animation-delay: 0.36s; }
+@keyframes breathe { 50% { opacity: 0.45; } }
+
+.empty { padding: 10px 0 14px; }
+.empty-title { margin: 0 0 4px; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+.empty-note { margin: 0; font-size: 12px; line-height: 1.55; color: var(--muted); }
+.empty-retry {
+  margin-top: 10px;
+  padding: 5px 0;
+  border: 0;
+  background: transparent;
+  color: var(--green);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.empty-retry:hover { text-decoration: underline; }
+
+button:focus-visible, a:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-radius: 4px; }
+
+/* Embedded: the host card already provides the frame, so the page is just the
+   card, filling the fixed height it is given. */
+html.embedded, .embedded body { height: 100%; background: #ffffff; overflow: hidden; }
+.embedded main { margin: 0; padding: 0; max-width: none; height: 100%; }
+.embedded .standalone-header { display: none; }
+.embedded .bulletin { height: 100%; border: 0; border-radius: 0; box-shadow: none; }
+.embedded .bulletin:hover { box-shadow: none; border-color: transparent; }
+.embedded .bulletin-body { flex: 1 1 auto; min-height: 0; max-height: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+  .icon-button, .bulletin { transition: none; }
+  .icon-button.spinning svg { animation: none; }
+}

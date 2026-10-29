@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="only light">
+  <title>Daily Bulletin · A Hilltoppers topping</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" type="module"></script>
+</head>
+<body>
+  <main>
+    <header class="standalone-header">
+      <span class="eyebrow">A HILLTOPPERS TOPPING</span>
+      <h1>Daily Bulletin</h1>
+    </header>
+
+    <section class="bulletin" id="bulletin" aria-busy="true">
+      <header class="bulletin-head">
+        <div class="bulletin-heading">
+          <p class="bulletin-weekday" id="weekday">Daily Bulletin</p>
+          <p class="bulletin-date" id="date">—</p>
+        </div>
+        <span class="day-pill" id="day-pill" hidden></span>
+        <button class="icon-button" id="refresh" type="button" aria-label="Check for a new bulletin" title="Check for a new bulletin">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4" />
+          </svg>
+        </button>
+      </header>
+
+      <div class="bulletin-body" id="body" role="status" aria-live="polite"></div>
+
+      <p class="bulletin-note" id="note" hidden></p>
+
+      <footer class="bulletin-foot">
+        <span class="bulletin-stamp" id="stamp"></span>
+        <a class="bulletin-link" id="source" href="https://stjacademy.org/a-culture-of-caring-and-respect/sja-news/daily-bulletin/" target="_blank" rel="noopener noreferrer">School site</a>
+      </footer>
+    </section>
+
+    <noscript>
+      <p class="bulletin-note">The bulletin needs JavaScript to load.</p>
+    </noscript>
+  </main>
+</body>
+</html>
