@@ -76,8 +76,8 @@ npm run typecheck
 npm test
 ```
 
-`npm run db:init` creates the local tables, and needs the `[[d1_databases]]` block
-uncommented first. Without it the local Worker scrapes on every request.
+`npm run db:init` creates the local tables; `wrangler dev` also creates them on
+the first request, so this is only for running the SQL by hand.
 
 The Firecrawl key is a secret, never a var:
 
@@ -102,20 +102,16 @@ In the dashboard, Worker → **Settings → Build**:
 Bindings and plain variables come from `wrangler.toml`, so they travel with the
 code. Secrets do not — set those in the dashboard.
 
-The `[[d1_databases]]` block in `wrangler.toml` ships commented out, so the first
-deploy works with no database and scrapes on each visit. To turn caching on:
-
-1. **Storage & Databases → D1 SQL Database → Create**, named `bulletin`, and copy
-   its database ID.
-2. Uncomment the `[[d1_databases]]` block in `wrangler.toml` and paste the ID.
-3. In that database's **Console**, run `migrations/0001_init.sql`. Until that
-   runs, `/api/bulletin` answers 503 with the D1 error rather than quietly never
-   caching.
-4. Commit. The build applies the binding, and `/api/health` should then report
-   `"database": true`.
+The D1 binding is committed in `wrangler.toml`, so a push applies it. The Worker
+creates its own tables on first request (`ensureSchema` in `src/cache.ts`), and
+`migrations/0001_init.sql` holds the same SQL for applying by hand.
 
 A binding added in the dashboard is not enough: a Wrangler deploy replaces the
-Worker's bindings with the ones in this file. The file is the source of truth.
+Worker's bindings with the ones in this file, so the file is the source of truth.
+
+If the database is unreachable the Worker falls back to scraping on each visit
+rather than failing, so a bad binding never takes the page down. `/api/health`
+reports `database` and `databaseReady` so you can tell which state you are in.
 
 Also: `name` in `wrangler.toml` must equal the Worker's name in the dashboard, or
 a build deploys a second, differently named Worker. `FIRECRAWL_API_KEY`, if you

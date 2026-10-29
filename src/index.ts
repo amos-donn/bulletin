@@ -1,6 +1,7 @@
 import {
   beginAttempt,
   EMPTY_STATE,
+  ensureSchema,
   finishAttempt,
   FRESH_MS,
   readLatest,
@@ -111,7 +112,16 @@ function sameOrigin(request: Request, url: URL): boolean {
 async function handleBulletin(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const now = Date.now();
   const today = schoolDate(new Date(now));
-  const db = (env.DB ?? null) as unknown as Database | null;
+  let db = (env.DB ?? null) as unknown as Database | null;
+  if (db) {
+    // A database we cannot prepare must not take the bulletin down with it:
+    // serving a fresh scrape beats serving an error page.
+    try {
+      await ensureSchema(db);
+    } catch {
+      db = null;
+    }
+  }
   const force = new URL(request.url).searchParams.get('refresh') === '1';
 
   const cached = db ? await readLatest(db).catch(() => null) : null;
@@ -153,11 +163,21 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === '/api/health') {
+      let databaseReady = false;
+      if (env.DB) {
+        try {
+          await ensureSchema(env.DB as unknown as Database);
+          databaseReady = true;
+        } catch {
+          databaseReady = false;
+        }
+      }
       return json(
         {
           ok: true,
           service: 'daily-bulletin',
           database: Boolean(env.DB),
+          databaseReady,
           firecrawl: Boolean(env.FIRECRAWL_API_KEY),
           source: env.BULLETIN_URL || DEFAULT_BULLETIN_URL
         },
