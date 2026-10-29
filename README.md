@@ -76,8 +76,8 @@ npm run typecheck
 npm test
 ```
 
-`npm run db:init` creates the local tables. The placeholder database id is fine
-for `wrangler dev`; only a real deploy needs the id from step 1 in Deploy.
+`npm run db:init` creates the local tables, and needs the `[[d1_databases]]` block
+uncommented first. Without it the local Worker scrapes on every request.
 
 The Firecrawl key is a secret, never a var:
 
@@ -102,16 +102,24 @@ In the dashboard, Worker → **Settings → Build**:
 Bindings and plain variables come from `wrangler.toml`, so they travel with the
 code. Secrets do not — set those in the dashboard.
 
-Setup, once:
+The `[[d1_databases]]` block in `wrangler.toml` ships commented out, so the first
+deploy works with no database and scrapes on each visit. To turn caching on:
 
-1. `npx wrangler d1 create bulletin`, then paste the printed `database_id` into
-   `wrangler.toml` (it replaces `__D1_DATABASE_ID__`).
-2. `npx wrangler d1 execute bulletin --remote --file=migrations/0001_init.sql`
-   to create the tables. Until that runs, `/api/bulletin` answers 503 with the D1
-   error rather than quietly never caching.
-3. Optional: add `FIRECRAWL_API_KEY` under **Settings → Variables and Secrets**.
-4. `name` in `wrangler.toml` must equal the Worker's name in the dashboard, or a
-   build deploys a second, differently named Worker.
+1. **Storage & Databases → D1 SQL Database → Create**, named `bulletin`, and copy
+   its database ID.
+2. Uncomment the `[[d1_databases]]` block in `wrangler.toml` and paste the ID.
+3. In that database's **Console**, run `migrations/0001_init.sql`. Until that
+   runs, `/api/bulletin` answers 503 with the D1 error rather than quietly never
+   caching.
+4. Commit. The build applies the binding, and `/api/health` should then report
+   `"database": true`.
+
+A binding added in the dashboard is not enough: a Wrangler deploy replaces the
+Worker's bindings with the ones in this file. The file is the source of truth.
+
+Also: `name` in `wrangler.toml` must equal the Worker's name in the dashboard, or
+a build deploys a second, differently named Worker. `FIRECRAWL_API_KEY`, if you
+want the fallback, is a secret under **Settings → Variables and Secrets**.
 
 ## Publishing it as a topping
 

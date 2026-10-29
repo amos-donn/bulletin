@@ -11,12 +11,14 @@ run_worker_first = true
 [vars]
 BULLETIN_URL = "https://stjacademy.org/a-culture-of-caring-and-respect/sja-news/daily-bulletin/"
 
-# The deploy workflow fills this in from the D1_DATABASE_ID repository secret.
-# Without that secret the workflow removes this block and the Worker scrapes
-# fresh on each visit instead of serving a stored copy.
-[[d1_databases]]
-binding = "DB"
-database_name = "bulletin"
-database_id = "__D1_DATABASE_ID__"
+# Caching is off until this points at a real database: without a binding the
+# Worker scrapes the school page on every visit. Bindings added in the dashboard
+# are replaced by this file on the next Wrangler deploy, so pin it here.
+# Uncomment the four lines and paste the database id to turn caching on.
+#
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "bulletin"
+# database_id = "__D1_DATABASE_ID__"
 
 # FIRECRAWL_API_KEY is a secret, not a var: `npx wrangler secret put FIRECRAWL_API_KEY`.
