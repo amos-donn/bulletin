@@ -76,9 +76,8 @@ npm run typecheck
 npm test
 ```
 
-`npm run db:init` needs the D1 binding in `wrangler.toml`; the placeholder id is
-fine locally. Without a `D1_DATABASE_ID` secret in CI the config is deployed with
-no database at all, and the Worker scrapes on every visit instead of caching.
+`npm run db:init` creates the local tables. The placeholder database id is fine
+for `wrangler dev`; only a real deploy needs the id from step 1 in Deploy.
 
 The Firecrawl key is a secret, never a var:
 
@@ -88,17 +87,31 @@ npx wrangler secret put FIRECRAWL_API_KEY
 
 ## Deploy
 
-`.github/workflows/deploy.yml` deploys on every push to `main` after typecheck and
-tests. It needs three repository secrets:
+Cloudflare's Git integration deploys on every push to `main`. There is no GitHub
+Actions workflow here, so no Cloudflare API token is needed anywhere.
 
-| Secret | What it is |
+In the dashboard, Worker → **Settings → Build**:
+
+| Field | Value |
 |---|---|
-| `CLOUDFLARE_API_TOKEN` | API token with **Workers Scripts: Edit** and **D1: Edit** |
-| `CLOUDFLARE_ACCOUNT_ID` | Account id from the Cloudflare dashboard |
-| `D1_DATABASE_ID` | Output of `npx wrangler d1 create bulletin` |
+| Build command | `npm ci` |
+| Deploy command | `npx wrangler deploy` |
+| Root directory | `/` |
+| Production branch | `main` |
 
-The workflow applies `migrations/0001_init.sql` before deploying, so the schema is
-created (or left alone) on every push.
+Bindings and plain variables come from `wrangler.toml`, so they travel with the
+code. Secrets do not — set those in the dashboard.
+
+Setup, once:
+
+1. `npx wrangler d1 create bulletin`, then paste the printed `database_id` into
+   `wrangler.toml` (it replaces `__D1_DATABASE_ID__`).
+2. `npx wrangler d1 execute bulletin --remote --file=migrations/0001_init.sql`
+   to create the tables. Until that runs, `/api/bulletin` answers 503 with the D1
+   error rather than quietly never caching.
+3. Optional: add `FIRECRAWL_API_KEY` under **Settings → Variables and Secrets**.
+4. `name` in `wrangler.toml` must equal the Worker's name in the dashboard, or a
+   build deploys a second, differently named Worker.
 
 ## Publishing it as a topping
 
